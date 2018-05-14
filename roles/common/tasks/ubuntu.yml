@@ -38,7 +38,7 @@
     become: false
 
   - name: Include unatteded upgrades configuration
-    include_tasks: unattended-upgrades.yml
+    import_tasks: unattended-upgrades.yml
 
   - name: Disable MOTD on login and SSHD
     replace: dest="{{ item.file }}" regexp="{{ item.regexp }}" replace="{{ item.line }}"

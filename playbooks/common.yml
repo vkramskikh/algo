@@ -12,4 +12,4 @@
   include_tasks: freebsd.yml
   when: '"FreeBSD" in OS.stdout'
 
-- include_tasks: facts/main.yml
+- import_tasks: facts/main.yml

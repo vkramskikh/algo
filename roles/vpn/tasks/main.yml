@@ -15,11 +15,11 @@
     - name: Install strongSwan
       package: name=strongswan state=present
 
-    - include_tasks: ipec_configuration.yml
-    - include_tasks: openssl.yml
+    - import_tasks: ipec_configuration.yml
+    - import_tasks: openssl.yml
       tags: update-users
-    - include_tasks: distribute_keys.yml
-    - include_tasks: client_configs.yml
+    - import_tasks: distribute_keys.yml
+    - import_tasks: client_configs.yml
       delegate_to: localhost
       become: no
       tags: update-users

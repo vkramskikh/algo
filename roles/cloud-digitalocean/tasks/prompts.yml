@@ -1,0 +1,28 @@
+---
+- pause:
+    prompt: |
+      Enter your API token. The token must have read and write permissions (https://cloud.digitalocean.com/settings/api/tokens):
+      [pasted values will not be displayed]
+    echo: false
+  register: _do_token
+  when: do_token is undefined
+
+- pause:
+    prompt: |
+      What region should the server be located in?
+        1.  Amsterdam        (Datacenter 2)
+        2.  Amsterdam        (Datacenter 3)
+        3.  Frankfurt
+        4.  London
+        5.  New York         (Datacenter 1)
+        6.  New York         (Datacenter 2)
+        7.  New York         (Datacenter 3)
+        8.  San Francisco    (Datacenter 1)
+        9.  San Francisco    (Datacenter 2)
+        10. Singapore
+        11. Toronto
+        12. Bangalore
+
+      Enter the number of your desired region
+  register: _do_region
+  when: do_region is undefined
