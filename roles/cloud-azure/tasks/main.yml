@@ -1,5 +1,8 @@
 ---
 - block:
+    - name: Include prompts
+      import_tasks: prompts.yml
+
     - set_fact:
         resource_group: "Algo_{{ region }}"
         secret: "{{ azure_secret | default(lookup('env','AZURE_SECRET'), true) }}"

@@ -61,7 +61,7 @@
     src: client_windows.ps1.j2
     dest: configs/{{ IP_subject_alt_name }}/windows_{{ item.0 }}.ps1
     mode: 0600
-  when: Win10_Enabled
+  when: algo_windows
   with_together:
     - "{{ users }}"
     - "{{ PayloadContent.results }}"

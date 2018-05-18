@@ -18,14 +18,3 @@
   file:
     path: "{{ SSH_keys.private }}"
     mode: 0600
-
-- name: Ensure the dynamic inventory exists
-  blockinfile:
-    dest: configs/inventory.dynamic
-    marker: "# {mark} ALGO MANAGED BLOCK"
-    create: true
-    block: |
-      [algo:children]
-      {% for group in cloud_providers.keys() %}
-      {{ group }}
-      {% endfor %}

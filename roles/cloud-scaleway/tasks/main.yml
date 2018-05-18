@@ -1,11 +1,14 @@
 - block:
+  - name: Include prompts
+    import_tasks: prompts.yml
+
   - name: Check if server exists
     uri:
       url: "https://cp-{{ algo_region }}.scaleway.com/servers"
       method: GET
       headers:
         Content-Type: 'application/json'
-        X-Auth-Token: "{{ scaleway_auth_token }}"
+        X-Auth-Token: "{{ algo_scaleway_token }}"
       status_code: 200
     register: scaleway_servers
 
@@ -24,7 +27,7 @@
         method: GET
         headers:
           Content-Type: 'application/json'
-          X-Auth-Token: "{{ scaleway_auth_token }}"
+          X-Auth-Token: "{{ algo_scaleway_token }}"
         status_code: 200
       register: scaleway_organizations
 
@@ -32,7 +35,7 @@
       set_fact:
         organization_id: "{{ item.id }}"
       no_log: true
-      when: scaleway_organization == item.name
+      when: algo_scaleway_org == item.name
       with_items: "{{ scaleway_organizations.json.organizations }}"
 
     - name: Get images
@@ -41,18 +44,16 @@
         method: GET
         headers:
           Content-Type: 'application/json'
-          X-Auth-Token: "{{ scaleway_auth_token }}"
+          X-Auth-Token: "{{ algo_scaleway_token }}"
         status_code: 200
       register: scaleway_images
+      with_sequence: start=1 end=10
 
     - name: Set image id as a fact
-      set_fact:
-        image_id: "{{ item.id }}"
-      no_log: true
-      when:
-        - cloud_providers.scaleway.image in item.name
-        - cloud_providers.scaleway.arch == item.arch
-      with_items: "{{ scaleway_images.json.images }}"
+      include_tasks: image_facts.yml
+      with_items: "{{ scaleway_images['results'] }}"
+      loop_control:
+        loop_var: outer_item
 
     - name: Create a server
       uri:
@@ -60,7 +61,7 @@
         method: POST
         headers:
           Content-Type: 'application/json'
-          X-Auth-Token: "{{ scaleway_auth_token }}"
+          X-Auth-Token: "{{ algo_scaleway_token }}"
         body:
           organization: "{{ organization_id }}"
           name: "{{ algo_server_name }}"
@@ -85,7 +86,7 @@
       method: POST
       headers:
         Content-Type: application/json
-        X-Auth-Token: "{{ scaleway_auth_token }}"
+        X-Auth-Token: "{{ algo_scaleway_token }}"
       body:
         action: poweron
       status_code: 202
@@ -99,7 +100,7 @@
       method: GET
       headers:
         Content-Type: 'application/json'
-        X-Auth-Token: "{{ scaleway_auth_token }}"
+        X-Auth-Token: "{{ algo_scaleway_token }}"
       status_code: 200
     until:
       - algo_instance.json.server.state is defined
@@ -118,7 +119,16 @@
       ansible_ssh_user: root
       ansible_python_interpreter: "/usr/bin/python2.7"
       ansible_ssh_private_key_file: "{{ SSH_keys.private }}"
-      cloud_provider: scaleway
+      algo_provider: "{{ algo_provider }}"
+      algo_server_name: "{{ algo_server_name }}"
+      algo_ondemand_cellular: "{{ algo_ondemand_cellular }}"
+      algo_ondemand_wifi: "{{ algo_ondemand_wifi }}"
+      algo_ondemand_wifi_exclude: "{{ algo_ondemand_wifi_exclude }}"
+      algo_local_dns: "{{ algo_local_dns }}"
+      algo_ssh_tunneling: "{{ algo_ssh_tunneling }}"
+      algo_windows: "{{ algo_windows }}"
+      algo_store_cakey: "{{ algo_store_cakey }}"
+      IP_subject_alt_name: "{{ IP_subject_alt_name }}"
 
   rescue:
   - debug: var=fail_hint

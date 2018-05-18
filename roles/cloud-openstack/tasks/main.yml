@@ -1,4 +1,8 @@
 ---
+- fail:
+    msg: "OpenStack credentials are not set. Download it from the OpenStack dashboard->Compute->API Access and source it in the shell (eg: source /tmp/dhc-openrc.sh)"
+  when: lookup('env', 'OS_AUTH_URL') == ""
+
 - block:
   - name: Security group created
     os_security_group:
@@ -77,7 +81,16 @@
       ansible_ssh_user: ubuntu
       ansible_python_interpreter: "/usr/bin/python2.7"
       ansible_ssh_private_key_file: "{{ SSH_keys.private }}"
-      cloud_provider: openstack
+      algo_provider: "{{ algo_provider }}"
+      algo_server_name: "{{ algo_server_name }}"
+      algo_ondemand_cellular: "{{ algo_ondemand_cellular }}"
+      algo_ondemand_wifi: "{{ algo_ondemand_wifi }}"
+      algo_ondemand_wifi_exclude: "{{ algo_ondemand_wifi_exclude }}"
+      algo_local_dns: "{{ algo_local_dns }}"
+      algo_ssh_tunneling: "{{ algo_ssh_tunneling }}"
+      algo_windows: "{{ algo_windows }}"
+      algo_store_cakey: "{{ algo_store_cakey }}"
+      IP_subject_alt_name: "{{ IP_subject_alt_name }}"
 
   rescue:
   - debug: var=fail_hint

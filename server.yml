@@ -19,9 +19,14 @@
           tags: always
 
   roles:
-    - { role: dns_adblocking, tags: [ 'dns', 'adblock' ] }
-    - { role: ssh_tunneling, tags: [ 'ssh_tunneling' ] }
-    - { role: vpn, tags: [ 'vpn' ] }
+    - role: dns_adblocking
+      when: algo_local_dns
+      tags: dns_adblocking
+    - role: ssh_tunneling
+      when: algo_ssh_tunneling
+      tags: ssh_tunneling
+    - role: vpn
+      tags: vpn
 
   post_tasks:
     - block:
@@ -31,7 +36,7 @@
           path: "configs/{{ IP_subject_alt_name }}/pki/private/cakey.pem"
           state: absent
         become: false
-        when: not Store_CAKEY
+        when: not algo_store_cakey
 
       - name: Dump the configuration
         local_action:
@@ -41,19 +46,22 @@
             server_ip: {{ ansible_ssh_host }}
             server_user: {{ ansible_ssh_user }}
             ansible_ssh_private_key_file: {{ ansible_ssh_private_key_file|default(SSH_keys.private) }}
-            ssh_tunneling: {{ ssh_tunneling }}
-            IP_subject_alt_name: {{ IP_subject_alt_name }}
-            OnDemandEnabled_Cellular: {{ OnDemandEnabled_Cellular }}
-            OnDemandEnabled_WIFI: {{ OnDemandEnabled_WIFI }}
-            OnDemandEnabled_WIFI_EXCLUDE: '{{ OnDemandEnabled_WIFI_EXCLUDE }}'
-            Win10_Enabled: {{ Win10_Enabled }}
+            algo_provider: {{ algo_provider }}
+            algo_server_name: {{ algo_server_name }}
+            algo_ondemand_cellular: {{ algo_ondemand_cellular }}
+            algo_ondemand_wifi: {{ algo_ondemand_wifi }}
+            algo_ondemand_wifi_exclude: {{ algo_ondemand_wifi_exclude }}
+            algo_local_dns: {{ algo_local_dns }}
+            algo_ssh_tunneling: {{ algo_ssh_tunneling }}
+            algo_windows: {{ algo_windows }}
+            algo_store_cakey: {{ algo_store_cakey }}
         become: false
 
       - debug:
           msg:
             - "{{ congrats.common.split('\n') }}"
             - "    {{ congrats.p12_pass }}"
-            - "    {% if Store_CAKEY %}{{ congrats.ca_key_pass }}{% endif %}"
+            - "    {% if algo_store_cakey %}{{ congrats.ca_key_pass }}{% endif %}"
             - "    {% if cloud_deployment is defined %}{{ congrats.ssh_access }}{% endif %}"
       tags: always
       rescue:

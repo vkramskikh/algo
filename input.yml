@@ -106,7 +106,7 @@
 
     - name: Set facts based on the input
       set_fact:
-        algo_provider: "{{ provider | default(providers_map[_algo_provider.user_input|default(omit)|int]['alias']) }}"
+        algo_provider: "{{ provider | default(providers_map[_algo_provider.user_input|default(omit)|int - 1]['alias']) }}"
         algo_server_name: >-
           {% if server_name is defined %}{{ server_name }}
           {%- elif _algo_server_name.user_input is defined and _algo_server_name.user_input != "" %}{{ _algo_server_name.user_input }}
@@ -140,12 +140,12 @@
           {%- elif _store_cakey.user_input is defined and _store_cakey.user_input != "" %}{{ booleans_map[_store_cakey.user_input] | default(defaults['store_cakey']) }}
           {%- else %}false{% endif %}
 
-    - debug: var=algo_provider
-    - debug: var=algo_server_name
-    - debug: var=algo_ondemand_cellular
-    - debug: var=algo_ondemand_wifi
-    - debug: var=algo_ondemand_wifi_exclude
-    - debug: var=algo_local_dns
-    - debug: var=algo_ssh_tunneling
-    - debug: var=algo_windows
-    - debug: var=algo_store_cakey
+    # - debug: var=algo_provider
+    # - debug: var=algo_server_name
+    # - debug: var=algo_ondemand_cellular
+    # - debug: var=algo_ondemand_wifi
+    # - debug: var=algo_ondemand_wifi_exclude
+    # - debug: var=algo_local_dns
+    # - debug: var=algo_ssh_tunneling
+    # - debug: var=algo_windows
+    # - debug: var=algo_store_cakey
