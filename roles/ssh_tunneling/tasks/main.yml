@@ -33,8 +33,8 @@
         createhome: yes
         generate_ssh_key: yes
         shell: /bin/false
-        ssh_key_type: ecdsa
-        ssh_key_bits: 256
+        ssh_key_type: rsa
+        ssh_key_bits: 2048
         ssh_key_comment: '{{ item }}@{{ IP_subject_alt_name }}'
         ssh_key_passphrase: "{{ easyrsa_p12_export_password }}"
         update_password: on_create
@@ -44,7 +44,7 @@
 
     - name: The authorized keys file created
       file:
-        src: '/var/jail/{{ item }}/.ssh/id_ecdsa.pub'
+        src: '/var/jail/{{ item }}/.ssh/id_rsa.pub'
         dest: '/var/jail/{{ item }}/.ssh/authorized_keys'
         owner: "{{ item }}"
         group: "{{ item }}"
@@ -57,7 +57,7 @@
 
     - name: Fetch users SSH private keys
       fetch:
-        src: '/var/jail/{{ item }}/.ssh/id_ecdsa'
+        src: '/var/jail/{{ item }}/.ssh/id_rsa'
         dest: configs/{{ IP_subject_alt_name }}/{{ item }}.ssh.pem
         flat: yes
       with_items: "{{ users }}"

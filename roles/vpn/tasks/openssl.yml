@@ -17,7 +17,6 @@
       state: directory
       recurse: yes
     with_items:
-      - ecparams
       - certs
       - crl
       - newcerts
@@ -42,9 +41,8 @@
 
   - name: Build the CA pair
     shell: >
-      {{ openssl_bin }} ecparam -name prime256v1 -out ecparams/prime256v1.pem &&
       {{ openssl_bin }} req -utf8 -new
-      -newkey {{ algo_params | default('ec:ecparams/prime256v1.pem') }}
+      -newkey {{ algo_params | default('rsa:2048') }}
       -config <(cat openssl.cnf <(printf "[basic_exts]\nsubjectAltName={{ subjectAltName }}"))
       -keyout private/cakey.pem
       -out cacert.pem -x509 -days 3650
@@ -71,7 +69,7 @@
   - name: Build the server pair
     shell: >
       {{ openssl_bin }} req -utf8 -new
-      -newkey {{ algo_params | default('ec:ecparams/prime256v1.pem') }}
+      -newkey {{ algo_params | default('rsa:2048') }}
       -config <(cat openssl.cnf <(printf "[basic_exts]\nsubjectAltName={{ subjectAltName }}"))
       -keyout private/{{ IP_subject_alt_name }}.key
       -out reqs/{{ IP_subject_alt_name }}.req -nodes
@@ -93,7 +91,7 @@
   - name: Build the client's pair
     shell: >
       {{ openssl_bin }} req -utf8 -new
-      -newkey {{ algo_params | default('ec:ecparams/prime256v1.pem') }}
+      -newkey {{ algo_params | default('rsa:2048') }}
       -config <(cat openssl.cnf <(printf "[basic_exts]\nsubjectAltName=DNS:{{ item }}"))
       -keyout private/{{ item }}.key
       -out reqs/{{ item }}.req -nodes
